@@ -1,6 +1,7 @@
 package Aufgabe1.dictionary;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.LinkedList;
 
 public class HashDictionary<K,V> implements Dictionary<K, V> {
@@ -15,13 +16,24 @@ public class HashDictionary<K,V> implements Dictionary<K, V> {
 	 */
 	
 	private static int size = 0; // Anzahl Elemente
-	private static int prim = 31; // Primzahl, die die Groese der Hashliste bestimmt.
+	private static int prim; // Primzahl, die die Groese der Hashliste bestimmt.
+	private static int loadFactor = 10;
 	
-	private LinkedList<Entry<K, V>>[] tab = new LinkedList[prim];
+	private LinkedList<Entry<K, V>>[] tab;
 	
 	//Konstruktor
-	private HashDictionary() {
+	public HashDictionary(int p) {
 		size = 0;
+		prim = p;
+		tab  = new LinkedList[prim];
+		for(int i = 0; i < tab.length; i++) {
+			tab[i] = new LinkedList<Entry<K, V>>();
+		}
+	}
+	public HashDictionary() {
+		size = 0;
+		prim = 31;
+		tab  = new LinkedList[prim];
 		for(int i = 0; i < tab.length; i++) {
 			tab[i] = new LinkedList<Entry<K, V>>();
 		}
@@ -37,27 +49,31 @@ public class HashDictionary<K,V> implements Dictionary<K, V> {
 	}
 	
 	private void ensureCapacity() {
-		int oldPrim = this.prim;
-		int newPrim = genPrim(oldPrim);
-		
-		LinkedList[] oldList = tab; 
-		tab = new LinkedList[newPrim];
-		for(Entity e: oldList) {
-			insert(e);
+		int oldPrim = prim;
+		prim = genPrim(prim);
+		LinkedList<Entry<K,V>>[] temp = new LinkedList[prim];
+		for(int i = 0; i < temp.length; i++) {
+			temp[i] = new LinkedList<Entry<K, V>>();
 		}
-		// erhhoet die Groese der Liste um eine etwa doppelt so grose Primzahl
-		// Gibt es ne moeglichkeit einfach an eine Primzahl zu kommen?
+		
+		for(int i = 0; i < oldPrim; i++) {
+			for(Entry<K,V> e: tab[i]) {
+				int pos = getPos(e.getKey());
+				Entry<K,V> ent = new Entry<>(e.getKey(), e.getValue());
+				temp[pos].add(ent);
+			}
+		}
+		
+		tab = temp;
 	}
-	
-	private void checkSize() {
-			if (size()/prim > 10) ensureCapcity();
-	}
-	
+
 	@Override
 	public V insert(K key, V value) {
-		// TODO muss mod K rechnen und danach den V einordnen, bei belegten platz sucht es den nächsten freien
-		
-		int pos = (int) key % prim; //position in Liste bestimmen
+		if (size()/prim > loadFactor) ensureCapacity();
+		int pos = getPos(key); //position in Liste bestimmen
+		for(Entry<K,V> e: tab[pos]) {
+		if(e.getKey().equals(key)) return e.setValue(value);
+	}
 		Entry<K, V> ent = new Dictionary.Entry<K, V>(key, value);
 		tab[pos].add(ent);
 		size++;
@@ -66,25 +82,33 @@ public class HashDictionary<K,V> implements Dictionary<K, V> {
 
 	@Override
 	public V search(K key) {
-		int pos = (int) key % prim;
-		if(tab[pos].contains(key)) {
-			return get(key.getValue);
+		int pos = getPos(key);
+		for(Entry<K, V> e: tab[pos]) {
+			if(e.getKey().equals(key)) return e.getValue();
 		}
 		return null;
-	}
-	
-	public boolean tsearch(K key) {
-		int pos = (int) key % prim;
-		if(tab[pos].contains(key)) {
-			return true;
-		}
-		return false;
 	}
 
 	@Override
 	public V remove(K key) {
-		size--;
+		int pos = getPos(key);
+		int rpos = 0;
+		for(Entry<K, V> e: tab[pos]) {
+			if(e.getKey().equals(key)) {
+				V val = e.getValue();
+				//Entry<K, V> ent = new Entry<>(key, val);
+				tab[pos].remove(rpos);
+				size--;
+				return val;
+			}
+			rpos++;
+		}
+		
 		return null;
+	}
+	
+	private int getPos(K key) {
+		return key.hashCode() % prim;
 	}
 
 	@Override
@@ -102,11 +126,6 @@ public class HashDictionary<K,V> implements Dictionary<K, V> {
 		int currInd = 0;
 		Iterator<Entry<K,V>> currListIterator = tab[0].iterator();
 		
-		public Entry<K,V> next() {
-			//if(hasNext()) throw new; //TODO: Fehlerbehandlung, schau mal was da sinnvoll ist
-			return currListIterator.next();
-		}
-		
 		public boolean hasNext() {
 			if(currListIterator.hasNext()) return true;
 			while (++currInd < tab.length) {
@@ -115,15 +134,42 @@ public class HashDictionary<K,V> implements Dictionary<K, V> {
 			}
 			return false;
 		}
+		public Entry<K,V> next() {
+			try {
+				if(!hasNext()) {
+					throw new Exception("kein hasNext");
+					}
+				return currListIterator.next();
+				} catch(Exception x) {
+					System.out.println("kein Next");
+					return null;
+				}
+		}
 	}
 	
-	public static void main(String[] args) {
-		HashDictionary d = new HashDictionary();
+	/*public static void main(String[] args) {
+		HashDictionary<String, String> d = new HashDictionary<>(1);
 		System.out.println(d.size());
-		d.insert(1, 1);
-		Entry<K, V> e = new Entry<int, int>(1, 1);
-		System.out.printf("Größe: %d, Wert vorhanden: %s", d.size(), d.tsearch(1));
+		d.insert("a", "Hello");
+		System.out.printf("Größe: %d, Wert vorhanden: %s%n", d.size(), d.search("a"));
+		d.remove("a");
+		System.out.printf("Größe: %d, Wert vorhanden: %s%n", d.size(), d.search("a"));
+		d.insert("blau", "bl");
+		d.insert("Katze", "cat");
+		d.insert("Hund", "dog");
+		d.insert("die", "the");
+		d.insert("stirb", "die");
+		d.insert("blau", "blue");
+		System.out.println(d.search("bl"));
+		System.out.println(d.search("Katze"));
+		System.out.println(d.search("Hund"));
+		System.out.println(d.search("die"));
+		System.out.println(d.search("stirb"));
+		d.remove("Hund");
+		System.out.println(d.search("Hund"));
+		System.out.println(d.search("blau"));
+
 		
-	}
+	}*/
 
 }
