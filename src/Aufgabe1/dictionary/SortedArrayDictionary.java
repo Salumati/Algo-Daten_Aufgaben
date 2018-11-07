@@ -1,4 +1,4 @@
-package aufg1;
+package Aufgabe1.dictionary;
 
 import java.util.NoSuchElementException;
 import java.util.Iterator;
