@@ -17,22 +17,22 @@ public class DictionaryTest {
 	 */
 	public static void main(String[] args)  {
 		
-		testSortedArrayDictionary();
+		//testSortedArrayDictionary();
 		testHashDictionary();
-		testBinaryTreeDictionary();
+		//testBinaryTreeDictionary();
 	}
 
-	private static void testSortedArrayDictionary() {
+	/*private static void testSortedArrayDictionary() {
 		Dictionary<String, String> dict = new SortedArrayDictionary<>();
 		testDict(dict);
-	}
+	}*/
 	
 	private static void testHashDictionary() {
 		Dictionary<String, String> dict = new HashDictionary<>(3);
 		testDict(dict);
 	}
 	
-	private static void testBinaryTreeDictionary() {
+	/*private static void testBinaryTreeDictionary() {
 		Dictionary<String, String> dict = new BinaryTreeDictionary<>();
 		testDict(dict);
         
@@ -74,7 +74,7 @@ public class DictionaryTest {
         btd.remove(50);
         System.out.println("remove:");
         btd.prettyPrint();
-    }
+    }*/
 	
 	private static void testDict(Dictionary<String, String> dict) {
 		System.out.println("===== New Test Case ========================");

@@ -108,9 +108,13 @@ public class HashDictionary<K,V> implements Dictionary<K, V> {
 	}
 	
 	private int getPos(K key) {
-		return key.hashCode() % prim;
+		int i = key.hashCode();
+		i = i % prim;
+		if(i < 0) i = i * -1;
+		return i;
 	}
 
+	
 	@Override
 	public int size() { //gibt ANzahl der Elemente in der Liste zurueck
 		return size;
@@ -121,6 +125,7 @@ public class HashDictionary<K,V> implements Dictionary<K, V> {
 		// TODO Auto-generated method stub
 		return new HashIterator();
 	}
+	
 	
 	private class HashIterator implements Iterator<Entry<K, V>>{
 		int currInd = 0;
@@ -147,7 +152,20 @@ public class HashDictionary<K,V> implements Dictionary<K, V> {
 		}
 	}
 	
-	/*public static void main(String[] args) {
+	public static void main(String[] args) {
+		
+		Dictionary<Integer, String> z = new HashDictionary<>(5);
+		
+		z.insert(1, "Eins");
+		z.insert(2, "Zwei");
+		z.insert(3, "Drei");
+		z.insert(4, "Vier");
+		z.insert(5, "Fünf");
+		for (Dictionary.Entry<Integer, String> e : z) {
+			System.out.println(e.getKey() + ": " + e.getValue() + " search: " + z.search(e.getKey()));
+		}
+		
+		/*
 		HashDictionary<String, String> d = new HashDictionary<>(1);
 		System.out.println(d.size());
 		d.insert("a", "Hello");
@@ -168,8 +186,8 @@ public class HashDictionary<K,V> implements Dictionary<K, V> {
 		d.remove("Hund");
 		System.out.println(d.search("Hund"));
 		System.out.println(d.search("blau"));
-
+		*/
 		
-	}*/
+	}
 
 }
