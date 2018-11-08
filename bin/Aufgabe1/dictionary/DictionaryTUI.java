@@ -20,11 +20,11 @@ public class DictionaryTUI {
 	 * TODO:
 	 * Komandos einfuegen:
 	 * -create Implementierung legt ein Dictionary an (ist voreingestellt)
-	 * -read[n] Dateiname  Liest die ersten n Einträge ein
-	 * -p Gibt alle Einträge auf konsole aus
+	 * -read[n] Dateiname  Liest die ersten n EintrÃ¤ge ein
+	 * -p Gibt alle EintrÃ¤ge auf konsole aus
 	 * -s deutsch gibt das englische wort aus
-	 * -i deutsch englisch fügt neues Wortpaar ein
-	 * -r deutsch  löscht einen Eintrag
+	 * -i deutsch englisch fÃ¼gt neues Wortpaar ein
+	 * -r deutsch  lÃ¶scht einen Eintrag
 	 * -exit beendet das Programm
 	 */
 	private static Dictionary<String, String> dict;
@@ -38,9 +38,9 @@ public class DictionaryTUI {
 		
 		/*		String[] createD = dictionary.split("//s+");*/
 		while(!sc.next().equals("create")) {
-			System.out.printf("Falsche eingabe: Bitte erstelle erst eine Implementierung über:%n "
+			System.out.printf("Falsche eingabe: Bitte erstelle erst eine Implementierung Ã¼ber:%n "
 					+ "create Implementierung %n" +
-						"Mögliche Implementierungen:%n"
+						"MÃ¶gliche Implementierungen:%n"
 						+ " SortedArrayDictionary  HashDictionary: (Eingabe HashD) %n");
 			
 		}
@@ -82,7 +82,7 @@ public class DictionaryTUI {
 				if(parts.length == 2) {
 					try{
 						
-						Scanner fs = new Scanner(new File("C:\\Users\\Sarah\\eclipse-workspace\\Aufgaben_Algo&Da\\src\\Aufgabe1\\dictionary\\dtengl.txt"));
+						Scanner fs = new Scanner(open().getPath());
 						
 						int linesToRead = Integer.parseInt(parts[1]);
 						int i = 0;
@@ -98,7 +98,7 @@ public class DictionaryTUI {
 					}
 				} else {
 					try{
-						Scanner fs = new Scanner(new File("C:\\Users\\Sarah\\eclipse-workspace\\Aufgaben_Algo&Da\\src\\Aufgabe1\\dictionary\\dictionary\\dtengl.txt"));
+						Scanner fs = new Scanner(open().getPath());
 						while(fs.hasNext()) {
 						dict.insert(fs.next(), fs.next());
 						}
@@ -113,9 +113,9 @@ public class DictionaryTUI {
 				System.out.println("Ausgabe Wort:");
 				System.out.println(dict.search(parts[1]));
 				
-			}else if(parts[0].equals("r")) { //Löschen
+			}else if(parts[0].equals("r")) { //LÃ¶schen
 				dict.remove(parts[1]);
-				System.out.println("Eintrag gelöscht");
+				System.out.println("Eintrag gelÃ¶scht");
 				
 			}else if(parts[0].equals("exit")) {// Programm beenden
 				System.out.println("Beendet");
@@ -125,13 +125,39 @@ public class DictionaryTUI {
 			}
 					else {//Hilfestellung
 				System.out.println("Fehlerhafte Eingabe");
-				System.out.printf("Mögliche Eingaben: %np %ns Wort %ni wort1 wort2 %nr wort %nexit%n");
+				System.out.printf("MÃ¶gliche Eingaben: %np %ns Wort %ni wort1 wort2 %nr wort %nexit%n");
 			}
 		}
 		sc.close();
 		return;
 	}
 	
+		private static File open() {
+		final JFileChooser openDialog = new JFileChooser("Datei auswÃ¤hlen");
+		openDialog.setDialogType(JFileChooser.OPEN_DIALOG);
+		openDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		
+		openDialog.setCurrentDirectory(new File("/home"));
+		
+		
+		
+		openDialog.addPropertyChangeListener(new PropertyChangeListener() {
+			
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				if(evt.getPropertyName().equals(JFileChooser.SELECTED_FILE_CHANGED_PROPERTY) || evt.getPropertyName().equals(JFileChooser.DIRECTORY_CHANGED_PROPERTY)){
+					final File file = (File) evt.getNewValue();
+				}
+				
+			}
+		});
+		openDialog.setVisible(true);
+		final int result = openDialog.showOpenDialog(null);
+		if(result == JFileChooser.APPROVE_OPTION) {
+			return openDialog.getSelectedFile();
+		}
+		return null;
+	}
 	
 	private static void create(String s) {
 		if(s.equals("HashD")) {
@@ -169,7 +195,7 @@ public class DictionaryTUI {
 		}
 		
 	} catch(Exception x) {
-		System.out.println("Keine Gültige Zahl.");
+		System.out.println("Keine GÃ¼ltige Zahl.");
 		break;
 	}
 } else {
