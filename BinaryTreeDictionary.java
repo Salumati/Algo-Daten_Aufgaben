@@ -49,6 +49,7 @@ public class BinaryTreeDictionary<K extends Comparable<? super K>, V> implements
 			if(p.left == null){
 				p.left = new Node<K, V>(key, value);
 				p.left.parent = p;
+				size++;
 				return null;
 			}
 			return insertR(key, value, p.left);
@@ -99,6 +100,7 @@ public class BinaryTreeDictionary<K extends Comparable<? super K>, V> implements
 		else if(p.left == null || p.right == null){
 			oldValue = p.value;
 			p = (p.left	!= null) ? p.left : p.right;
+			size--;
 		}
 		else {
 			MinEntry<K,V> min = new MinEntry<K,V>();
@@ -131,20 +133,119 @@ public class BinaryTreeDictionary<K extends Comparable<? super K>, V> implements
 		return size;
 	}
 
-	@Override
-	public Iterator<aufg1.Dictionary.Entry<K, V>> iterator() {
-		LinkedList<Entry<K,V>> l = new LinkedList<>();
-		sortList(l, root);
-		
-		return l.iterator();
+	private int	getHeight(Node<K,V> p) {
+		if (p ==null)
+			return -1;
+		else 
+			return	p.height;
 	}
 	
-	private void sortList(LinkedList<Entry<K,V>> li, Node<K,V> p){
-		if(p != null) {
-			sortList(li, p.left);
-			li.add(p);
-			sortList(li, p.right);
+	private int	getBalance(Node<K,V> p) {
+		if	(p == null)	
+			return 0;
+		else 
+			return	getHeight(p.right) - getHeight(p.left);
+	}
+	private	Node<K,V> balance (Node<K,V> p) {
+		if(p ==	null)
+			return null;
+		p.height = Math.max(getHeight(p.left), getHeight(p.right)) + 1;
+		if(getBalance(p) ==	-2) {
+			if(getBalance(p.left) <= 0)
+				p = rotateRight(p);
+			else
+				p = rotateLeftRight(p);
 		}
+		else if(getBalance(p) == +2) {
+			if(getBalance(p.right) >= 0)
+				p = rotateLeft(p);
+			else
+				p = rotateRightLeft(p);
+		}
+		return	p;
+	}
+
+	private	Node<K,V> rotateRight(Node<K,V> p) {
+		assert	p.left !=null;
+		Node<K, V>	q = p.left;
+		p.left = q.right;
+		q.right = p;
+		p.height = Math.max(getHeight(p.left), getHeight(p.right)) + 1;
+		q.height = Math.max(getHeight(q.left), getHeight(q.right)) + 1;
+		return	q;
+	}
+	
+	private	Node<K,V> rotateLeft(Node<K,V> p) {
+		assert	p.right !=null;
+		Node<K, V>	q = p.right;
+		p.right = q.left;
+		q.left = p;
+		q.height = Math.max(getHeight(q.right), getHeight(q.left)) + 1;
+		p.height = Math.max(getHeight(p.right), getHeight(p.left)) + 1;
+		
+		return	q;
+		}
+	
+	private	Node<K,V> rotateLeftRight(Node<K,V> p) {
+		assert p.left !=null;
+		p.left = rotateLeft(p.left);
+		return rotateRight(p);
+	}
+	
+	private	Node<K,V> rotateRightLeft(Node<K,V> p) {
+		assert	p.right !=	null;
+		p.right = rotateRight(p.right);
+		return rotateLeft(p);
+	}
+	@Override
+	public Iterator<aufg1.Dictionary.Entry<K, V>> iterator() {
+		return new TreeIterator();
+	}
+	class TreeIterator implements Iterator<aufg1.Dictionary.Entry<K, V>>{
+		Node<K,V> current = null;
+		int i = 0;
+		public aufg1.Dictionary.Entry<K, V> next() {
+			Node<K,V> p = null;
+			if (root != null)
+				p = leftMostDescendant(root);
+			
+			while(p != null){
+				//return new Entry<K,V>(p.key, p.value);
+				if(current ==  null || p.key.compareTo(current.key) > 0) {
+					current = p;
+					i++;
+					return new Entry<K,V>(p.key, p.value);
+				}
+				
+				if (p.right != null)
+					p= leftMostDescendant(p.right);
+				else
+					p = parentOfLeftMostAncestor(p);
+				
+				
+			}
+			return null;
+		}
+
+		@Override
+		public boolean hasNext() {
+			if(i < size()) return true;
+			return false;
+		}
+		
+		private Node<K,V>  parentOfLeftMostAncestor(Node<K,V>  p) {
+			assert p != null;
+			while (p.parent != null && p.parent.right  == p)
+				p = p.parent;
+			return p.parent;	// kann auch null sein
+		}
+		
+		private Node<K,V>  leftMostDescendant(Node<K,V>  p) {
+			assert p != null;
+			while (p.left  != null)
+				p = p.left;return p;
+		}
+		
 	}
 	
 	void prettyPrint() {
@@ -159,12 +260,13 @@ public class BinaryTreeDictionary<K extends Comparable<? super K>, V> implements
         	
         	for(int j = 1; j < i; j++)
         	{
-        		s.append("   ");
+        		s.append("   ");//Abstand halten
         	}
-        	s.append("|_ ");
+        	s.append("|_ ");//zweig anzeigen
         	}
-        	s.append(p.key);
-            appendPP(s, i + 1, p.left);
+        	s.append(p.key);//Schluessel anzeigen
+        	if(p.parent != null) s.append("->" + p.parent.key);
+            appendPP(s, i + 1, p.left);//linkes Kind anzeigen
             if(p.left == null && p.right != null) {
             	s.append("\n");
             	for(int j = 0; j < i; j++) {
