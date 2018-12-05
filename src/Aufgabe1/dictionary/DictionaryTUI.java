@@ -53,6 +53,7 @@ public class DictionaryTUI {
 			create(dictionary);
 			System.out.println("neues Dictonary wurde erstellt");
 			
+			
 			/* ARbeiten im Dictionary */
 			
 			while(sc.hasNextLine()) {
@@ -61,7 +62,6 @@ public class DictionaryTUI {
 				String[]parts = s.split("\\s+");
 				//System.out.println(parts.length);
 				System.out.println(parts[0]);
-				
 				
 				if(parts[0].equals("i") && parts.length == 3) { //neuer Eintrag
 						dict.insert(parts[1], parts[2]);
