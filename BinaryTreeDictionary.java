@@ -1,12 +1,10 @@
 package aufg1;
 
-import Aufgabe1.dictionary.Dictionary;
-
 import java.util.Iterator;
 import java.util.LinkedList;
 
 public class BinaryTreeDictionary<K extends Comparable<? super K>, V> implements Dictionary<K, V> {
-
+	
 	private class Node<K extends Comparable<? super K>, V> {
 		int height;
 		//Entry<K, V> e = new Entry<K, V>(K key, V value);
@@ -24,7 +22,7 @@ public class BinaryTreeDictionary<K extends Comparable<? super K>, V> implements
 			right = null;
 		}
 	}
-
+	
 	private V oldValue;
 	private Node<K, V> root = null;
 	private int size = 0;
@@ -36,7 +34,7 @@ public class BinaryTreeDictionary<K extends Comparable<? super K>, V> implements
 			return null;
 		}
 		Node<K,V> p = insertR(key, value, root);
-
+		
 		if(p == null || value.equals(p.value))
 		{
 			return null;
@@ -45,7 +43,7 @@ public class BinaryTreeDictionary<K extends Comparable<? super K>, V> implements
 		p.value = value;
 		return oldValue;
 	}
-
+	
 	private Node<K,V> insertR(K key, V value, Node<K, V> p){
 		if(key.compareTo(p.key) < 0) {
 			if(p.left == null){
@@ -77,7 +75,7 @@ public class BinaryTreeDictionary<K extends Comparable<? super K>, V> implements
 		}
 		return null;
 	}
-
+	
 	public Node<K,V> searchR(K key, Node<K, V> p){
 		if(p == null) return null;
 		else if(key.compareTo(p.key) < 0) return searchR(key, p.left);
@@ -90,7 +88,7 @@ public class BinaryTreeDictionary<K extends Comparable<? super K>, V> implements
 		root = removeR(key, root);
 		return oldValue;
 	}
-
+	
 	public Node<K, V> removeR(K key, Node<K, V> p){
 		if(p == null) oldValue = null;
 		else if(key.compareTo(p.key) < 0){
@@ -114,7 +112,7 @@ public class BinaryTreeDictionary<K extends Comparable<? super K>, V> implements
 		}
 		return p;
 	}
-
+	
 	private Node<K,V> getRemMinR(Node<K,V> p, MinEntry<K,V> min)
 	{
 		assert p!= null;
@@ -129,7 +127,7 @@ public class BinaryTreeDictionary<K extends Comparable<? super K>, V> implements
 		private K key;
 		private V value;
 	}
-
+	
 	@Override
 	public int size() {
 		return size;
@@ -138,14 +136,14 @@ public class BinaryTreeDictionary<K extends Comparable<? super K>, V> implements
 	private int	getHeight(Node<K,V> p) {
 		if (p ==null)
 			return -1;
-		else
+		else 
 			return	p.height;
 	}
-
+	
 	private int	getBalance(Node<K,V> p) {
-		if	(p == null)
+		if	(p == null)	
 			return 0;
-		else
+		else 
 			return	getHeight(p.right) - getHeight(p.left);
 	}
 	private	Node<K,V> balance (Node<K,V> p) {
@@ -176,7 +174,7 @@ public class BinaryTreeDictionary<K extends Comparable<? super K>, V> implements
 		q.height = Math.max(getHeight(q.left), getHeight(q.right)) + 1;
 		return	q;
 	}
-
+	
 	private	Node<K,V> rotateLeft(Node<K,V> p) {
 		assert	p.right !=null;
 		Node<K, V>	q = p.right;
@@ -184,23 +182,23 @@ public class BinaryTreeDictionary<K extends Comparable<? super K>, V> implements
 		q.left = p;
 		q.height = Math.max(getHeight(q.right), getHeight(q.left)) + 1;
 		p.height = Math.max(getHeight(p.right), getHeight(p.left)) + 1;
-
+		
 		return	q;
-	}
-
+		}
+	
 	private	Node<K,V> rotateLeftRight(Node<K,V> p) {
 		assert p.left !=null;
 		p.left = rotateLeft(p.left);
 		return rotateRight(p);
 	}
-
+	
 	private	Node<K,V> rotateRightLeft(Node<K,V> p) {
 		assert	p.right !=	null;
 		p.right = rotateRight(p.right);
 		return rotateLeft(p);
 	}
 	@Override
-	public Iterator<Dictionary.Entry<K, V>> iterator() {
+	public Iterator<aufg1.Dictionary.Entry<K, V>> iterator() {
 		return new TreeIterator();
 	}
 	class TreeIterator implements Iterator<aufg1.Dictionary.Entry<K, V>>{
@@ -210,7 +208,7 @@ public class BinaryTreeDictionary<K extends Comparable<? super K>, V> implements
 			Node<K,V> p = null;
 			if (root != null)
 				p = leftMostDescendant(root);
-
+			
 			while(p != null){
 				//return new Entry<K,V>(p.key, p.value);
 				if(current ==  null || p.key.compareTo(current.key) > 0) {
@@ -218,13 +216,13 @@ public class BinaryTreeDictionary<K extends Comparable<? super K>, V> implements
 					i++;
 					return new Entry<K,V>(p.key, p.value);
 				}
-
+				
 				if (p.right != null)
 					p= leftMostDescendant(p.right);
 				else
 					p = parentOfLeftMostAncestor(p);
-
-
+				
+				
 			}
 			return null;
 		}
@@ -234,56 +232,56 @@ public class BinaryTreeDictionary<K extends Comparable<? super K>, V> implements
 			if(i < size()) return true;
 			return false;
 		}
-
+		
 		private Node<K,V>  parentOfLeftMostAncestor(Node<K,V>  p) {
 			assert p != null;
 			while (p.parent != null && p.parent.right  == p)
 				p = p.parent;
 			return p.parent;	// kann auch null sein
 		}
-
+		
 		private Node<K,V>  leftMostDescendant(Node<K,V>  p) {
 			assert p != null;
 			while (p.left  != null)
 				p = p.left;return p;
 		}
-
+		
 	}
-
+	
 	void prettyPrint() {
-		StringBuilder sb = new StringBuilder();
-		appendPP(sb, 0, root);
-		System.out.println(sb.toString());
-	}
+    	StringBuilder sb = new StringBuilder();
+    	appendPP(sb, 0, root);
+    	System.out.println(sb.toString());
+    }
 	private void appendPP(StringBuilder s, int i, Node<K, V> p) {
-		if (p != null) {
-			if(i != 0) {
-				s.append("\n");
-
-				for(int j = 1; j < i; j++)
-				{
-					s.append("   ");//Abstand halten
-				}
-				s.append("|_ ");//zweig anzeigen
-			}
-			s.append(p.key);//Schluessel anzeigen
-			if(p.parent != null) s.append("->" + p.parent.key);
-			appendPP(s, i + 1, p.left);//linkes Kind anzeigen
-			if(p.left == null && p.right != null) {
-				s.append("\n");
-				for(int j = 0; j < i; j++) {
-					s.append("   ");
-				}
-				s.append("|_ #");
-			}
-			appendPP(s, i + 1, p.right);
-			if(p.left != null && p.right == null) {
-				s.append("\n");
-				for(int j = 0; j < i; j++) {
-					s.append("   ");
-				}
-				s.append("|_ #");
-			}
-		}
+        if (p != null) {
+        	if(i != 0) {
+        		s.append("\n");
+        	
+        	for(int j = 1; j < i; j++)
+        	{
+        		s.append("   ");//Abstand halten
+        	}
+        	s.append("|_ ");//zweig anzeigen
+        	}
+        	s.append(p.key);//Schluessel anzeigen
+        	if(p.parent != null) s.append("->" + p.parent.key);
+            appendPP(s, i + 1, p.left);//linkes Kind anzeigen
+            if(p.left == null && p.right != null) {
+            	s.append("\n");
+            	for(int j = 0; j < i; j++) {
+            		s.append("   ");
+            	}
+            	s.append("|_ #");
+            	}
+            appendPP(s, i + 1, p.right);
+            if(p.left != null && p.right == null) {
+            	s.append("\n");
+            	for(int j = 0; j < i; j++) {
+            		s.append("   ");
+            	}
+            	s.append("|_ #");
+            }
+        }
 	}
 }
